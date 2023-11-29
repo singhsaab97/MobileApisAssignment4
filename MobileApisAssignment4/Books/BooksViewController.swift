@@ -97,10 +97,6 @@ extension BooksViewController: UITableViewDataSource {
 // MARK: - BooksViewModelPresenter Methods
 extension BooksViewController: BooksViewModelPresenter {
     
-    func setNavigationTitle(_ title: String) {
-        navigationItem.title = title
-    }
-    
     func startLoading() {
         spinnerView.isHidden = false
         spinnerView.startAnimating()

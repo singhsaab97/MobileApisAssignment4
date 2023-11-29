@@ -98,7 +98,7 @@ extension BooksViewModel {
     }
     
     func addButtonTapped() {
-        showBookCRUDScreen(for: nil)
+        showBookCRUDScreen()
     }
     
     func getCellViewModel(at indexPath: IndexPath) -> BookCellViewModelable? {
@@ -108,7 +108,7 @@ extension BooksViewModel {
     
     func didSelectBook(at indexPath: IndexPath) {
         guard let book = books[safe: indexPath.row] else { return }
-        showBookCRUDScreen(for: book)
+        showBookCRUDScreen(with: book.id)
     }
     
 }
@@ -117,6 +117,7 @@ extension BooksViewModel {
 private extension BooksViewModel {
     
     func fetchBooks() {
+        presenter?.startLoading()
         DataHandler.shared.fetchBooks(with: authToken) { result in
             DispatchQueue.main.async { [weak self] in
                 self?.presenter?.stopLoading()
@@ -132,10 +133,11 @@ private extension BooksViewModel {
         }
     }
     
-    func showBookCRUDScreen(for book: Book?) {
-        let viewModel = BookCRUDViewModel(book: book)
+    func showBookCRUDScreen(with bookId: String? = nil) {
+        let viewModel = BookCRUDViewModel(bookId: bookId, authToken: authToken)
         let viewController = BookCRUDViewController.loadFromStoryboard()
         viewController.viewModel = viewModel
+        viewModel.presenter = viewController
         presenter?.push(viewController)
     }
     

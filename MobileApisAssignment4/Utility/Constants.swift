@@ -19,6 +19,7 @@ struct Constants {
     static let booksViewController = String(describing: BooksViewController.self)
     static let bookCRUDViewController = String(describing: BookCRUDViewController.self)
     static let bookCell = String(describing: BookTableViewCell.self)
+    static let bookFieldCell = String(describing: BookFieldTableViewCell.self)
     static let toastView = String(describing: ToastView.self)
     
     static let signUpTitle = "Create account"
@@ -52,6 +53,11 @@ struct Constants {
     static let alertCancelTitle = "Cancel"
     
     static let addBook = "Add book"
+    static let bookDetails = "Book details"
+    static let nameFieldPlaceholder = "Name"
+    static let ratingFieldPlaceholder = "Rating (out of 5)"
+    static let authorFieldPlaceholder = "Author"
+    static let genreFieldPlaceholder = "Genre"
 
     static let baseUrlPath = "https://book-app-mdev1004-7cd0dc8e1c90.herokuapp.com/"
     static let getMethod = "GET"

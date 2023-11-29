@@ -16,6 +16,7 @@ enum ApiConstructor {
     case register(firstName: String, lastName: String, emailId: String, password: String)
     case login(emailId: String, password: String)
     case books(authToken: String)
+    case book(id: String, authToken: String)
 }
 
 // MARK: - Exposed Helpers
@@ -30,6 +31,8 @@ extension ApiConstructor {
             urlPath = "auth/login"
         case .books:
             urlPath = "book"
+        case let .book(id, _):
+            urlPath = "book/\(id)"
         }
         return URL(string: "\(Constants.baseUrlPath)\(urlPath)")
     }
@@ -48,7 +51,7 @@ extension ApiConstructor {
                 "email": emailId,
                 "password": password
             ]
-        case .books:
+        case .books, .book:
             return nil
         }
     }
