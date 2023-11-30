@@ -49,6 +49,7 @@ extension BookFieldTableViewCell {
 private extension BookFieldTableViewCell {
     
     func setup() {
+        selectionStyle = .none
         detailTextField.borderStyle = .none
         detailTextField.delegate = self
     }
@@ -57,5 +58,9 @@ private extension BookFieldTableViewCell {
 
 // MARK: - UITextFieldDelegate Methods
 extension BookFieldTableViewCell: UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        return viewModel?.didTypeText(textField.text, range: range, newText: string) ?? false
+    }
     
 }

@@ -111,6 +111,18 @@ extension BooksViewController: BooksViewModelPresenter {
         tableView.reloadSections(indexSet, with: .fade)
     }
     
+    func insertRows(at indexPaths: [IndexPath]) {
+        tableView.insertRows(at: indexPaths, with: .fade)
+    }
+    
+    func reloadRows(at indexPaths: [IndexPath]) {
+        tableView.reloadRows(at: indexPaths, with: .fade)
+    }
+    
+    func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {
+        tableView.scrollToRow(at: indexPath, at: position, animated: true)
+    }
+    
     func push(_ viewController: UIViewController) {
         navigationController?.pushViewController(viewController, animated: true)
     }

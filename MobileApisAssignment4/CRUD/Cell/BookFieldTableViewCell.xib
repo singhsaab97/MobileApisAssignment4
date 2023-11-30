@@ -18,7 +18,7 @@
                 <subviews>
                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6Cz-tX-m5U">
                         <rect key="frame" x="20" y="15" width="291" height="44"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <textInputTraits key="textInputTraits"/>
                     </textField>
                 </subviews>

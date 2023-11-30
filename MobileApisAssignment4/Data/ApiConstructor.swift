@@ -10,6 +10,8 @@ import Foundation
 enum RequestType {
     case get
     case post
+    case put
+    case delete
 }
 
 enum ApiConstructor {
@@ -17,6 +19,8 @@ enum ApiConstructor {
     case login(emailId: String, password: String)
     case books(authToken: String)
     case book(id: String, authToken: String)
+    case create(book: Book, authToken: String)
+    case update(book: Book, authToken: String)
 }
 
 // MARK: - Exposed Helpers
@@ -33,6 +37,10 @@ extension ApiConstructor {
             urlPath = "book"
         case let .book(id, _):
             urlPath = "book/\(id)"
+        case .create:
+            urlPath = "book/create"
+        case let .update(book, _):
+            urlPath = "book/update/\(book.id)"
         }
         return URL(string: "\(Constants.baseUrlPath)\(urlPath)")
     }
@@ -51,6 +59,14 @@ extension ApiConstructor {
                 "email": emailId,
                 "password": password
             ]
+        case let .create(book, _),
+            let .update(book, _):
+            return [
+                Book.CodingKeys.name.rawValue: book.name,
+                Book.CodingKeys.rating.rawValue: book.rating,
+                Book.CodingKeys.author.rawValue: book.author,
+                Book.CodingKeys.genre.rawValue: book.genre
+            ]
         case .books, .book:
             return nil
         }
@@ -67,6 +83,10 @@ extension RequestType {
             return Constants.getMethod
         case .post:
             return Constants.postMethod
+        case .put:
+            return Constants.putMethod
+        case .delete:
+            return Constants.deleteMethod
         }
     }
     

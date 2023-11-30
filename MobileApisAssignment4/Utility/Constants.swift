@@ -58,10 +58,15 @@ struct Constants {
     static let ratingFieldPlaceholder = "Rating (out of 5)"
     static let authorFieldPlaceholder = "Author"
     static let genreFieldPlaceholder = "Genre"
+    static let bookFieldValidationErrorSubtext = "is required"
+    static let ratingOutOfBounds = "Rating must fall between 0 and 5"
+    static let bookExists = "A matching book already exists"
 
     static let baseUrlPath = "https://book-app-mdev1004-7cd0dc8e1c90.herokuapp.com/"
     static let getMethod = "GET"
     static let postMethod = "POST"
+    static let putMethod = "PUT"
+    static let deleteMethod = "DELETE"
     static let genericResponseError = "Something went wrong. Please try again in some time"
     
 }

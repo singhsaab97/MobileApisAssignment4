@@ -16,13 +16,4 @@ extension UIViewController {
         return navigationController
     }
     
-    func popViewController(completion: (() -> Void)?) {
-        CATransaction.begin()
-        CATransaction.setCompletionBlock {
-            completion?()
-        }
-        navigationController?.popViewController(animated: true)
-        CATransaction.commit()
-    }
-    
 }

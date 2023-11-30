@@ -43,6 +43,16 @@ extension DataHandler {
         initiateRequest(type: .get, with: targetApi, completion: completion)
     }
     
+    func addBook(_ book: Book, authToken: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        let targetApi = ApiConstructor.create(book: book, authToken: authToken)
+        initiateRequest(type: .post, with: targetApi, completion: completion)
+    }
+    
+    func updateBook(_ book: Book, authToken: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        let targetApi = ApiConstructor.update(book: book, authToken: authToken)
+        initiateRequest(type: .put, with: targetApi, completion: completion)
+    }
+    
 }
 
 // MARK: - Private Helpers
@@ -57,7 +67,9 @@ private extension DataHandler {
         case .register, .login:
             break
         case let .books(token),
-            let .book(_, token):
+            let .book(_, token),
+            let .create(_, token),
+            let .update(_, token):
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let params = targetApi.bodyParams,

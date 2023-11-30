@@ -15,6 +15,9 @@ protocol BooksViewModelPresenter: AnyObject {
     func startLoading()
     func stopLoading()
     func reloadSections(_ sections: IndexSet)
+    func insertRows(at indexPaths: [IndexPath])
+    func reloadRows(at indexPaths: [IndexPath])
+    func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition)
     func push(_ viewController: UIViewController)
     func present(_ viewController: UIViewController)
     func dismiss()
@@ -134,11 +137,47 @@ private extension BooksViewModel {
     }
     
     func showBookCRUDScreen(with bookId: String? = nil) {
-        let viewModel = BookCRUDViewModel(bookId: bookId, authToken: authToken)
+        let viewModel = BookCRUDViewModel(
+            bookId: bookId,
+            authToken: authToken,
+            listener: self
+        )
         let viewController = BookCRUDViewController.loadFromStoryboard()
         viewController.viewModel = viewModel
         viewModel.presenter = viewController
         presenter?.push(viewController)
+    }
+    
+    func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {
+        DispatchQueue.main.async { [weak self] in
+            self?.presenter?.scroll(to: indexPath, at: position)
+        }
+    }
+    
+}
+
+// MARK: - BookCRUDViewModelListener Methods
+extension BooksViewModel: BookCRUDViewModelListener {
+    
+    func add(book: Book) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.delayDuration) { [weak self] in
+            guard let self = self else { return }
+            books.append(book)
+            let indexPath = IndexPath(row: books.count - 1, section: 0)
+            presenter?.insertRows(at: [indexPath])
+            scroll(to: indexPath, at: .bottom)
+        }
+    }
+    
+    func update(book: Book) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.delayDuration) { [weak self] in
+            guard let self = self,
+                  let index = books.firstIndex(where: { $0.id == book.id }) else { return }
+            books[index] = book
+            let indexPath = IndexPath(row: index, section: 0)
+            presenter?.reloadRows(at: [indexPath])
+            scroll(to: indexPath, at: .middle)
+        }
     }
     
 }

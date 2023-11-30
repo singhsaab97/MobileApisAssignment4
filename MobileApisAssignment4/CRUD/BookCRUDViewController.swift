@@ -17,11 +17,35 @@ final class BookCRUDViewController: UIViewController,
     @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet private weak var spinnerView: UIActivityIndicatorView!
     
+    private lazy var doneButton: UIBarButtonItem = {
+        return UIBarButtonItem(
+            barButtonSystemItem: .done,
+            target: self,
+            action: #selector(doneButtonTapped)
+        )
+    }()
+    
+    private lazy var doneSpinnerView: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .medium)
+        view.hidesWhenStopped = true
+        return view
+    }()
+    
     var viewModel: BookCRUDViewModelable?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
 
 }
@@ -37,12 +61,6 @@ private extension BookCRUDViewController {
     }
     
     func addDoneButton() {
-        let doneButton = UIBarButtonItem(
-            barButtonSystemItem: .done,
-            target: self,
-            action: #selector(doneButtonTapped)
-        )
-        doneButton.isEnabled = false
         navigationItem.rightBarButtonItem = doneButton
     }
     
@@ -79,15 +97,6 @@ private extension BookCRUDViewController {
     
 }
 
-// MARK: - UITableViewDelegate Methods
-extension BookCRUDViewController: UITableViewDelegate {
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // TODO
-    }
-    
-}
-
 // MARK: - UITableViewDataSource Methods
 extension BookCRUDViewController: UITableViewDataSource {
     
@@ -117,14 +126,22 @@ extension BookCRUDViewController: BookCRUDViewModelPresenter {
         spinnerView.isHidden = true
     }
     
+    func startLoadingDoneButton() {
+        view.isUserInteractionEnabled = false
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: doneSpinnerView)
+        doneSpinnerView.startAnimating()
+    }
+    
+    func stopLoadingDoneButton() {
+        view.isUserInteractionEnabled = true
+        doneSpinnerView.stopAnimating()
+        navigationItem.rightBarButtonItem = doneButton
+    }
+    
     func setNavigationTitle(_ title: String) {
         navigationItem.title = title
     }
-    
-    func updateDoneButton(isEnabled: Bool) {
-        // TODO
-    }
-    
+  
     func reloadSections(_ indexSet: IndexSet) {
         tableView.reloadSections(indexSet, with: .fade)
     }
@@ -143,7 +160,7 @@ extension BookCRUDViewController: BookCRUDViewModelPresenter {
         }
     }
     
-    func dismiss() {
+    func pop() {
         navigationController?.popViewController(animated: true)
     }
     
