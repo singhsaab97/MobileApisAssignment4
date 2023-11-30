@@ -21,6 +21,7 @@ enum ApiConstructor {
     case book(id: String, authToken: String)
     case create(book: Book, authToken: String)
     case update(book: Book, authToken: String)
+    case delete(id: String, authToken: String)
 }
 
 // MARK: - Exposed Helpers
@@ -41,6 +42,8 @@ extension ApiConstructor {
             urlPath = "book/create"
         case let .update(book, _):
             urlPath = "book/update/\(book.id)"
+        case let .delete(id, _):
+            urlPath = "book/del/\(id)"
         }
         return URL(string: "\(Constants.baseUrlPath)\(urlPath)")
     }
@@ -67,7 +70,7 @@ extension ApiConstructor {
                 Book.CodingKeys.author.rawValue: book.author,
                 Book.CodingKeys.genre.rawValue: book.genre
             ]
-        case .books, .book:
+        case .books, .book, .delete:
             return nil
         }
     }

@@ -76,6 +76,10 @@ extension BooksViewController: UITableViewDelegate {
         viewModel?.didSelectBook(at: indexPath)
     }
     
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        return viewModel?.trailingSwipedBook(at: indexPath)
+    }
+    
 }
 
 // MARK: - UITableViewDataSource Methods
@@ -117,6 +121,10 @@ extension BooksViewController: BooksViewModelPresenter {
     
     func reloadRows(at indexPaths: [IndexPath]) {
         tableView.reloadRows(at: indexPaths, with: .fade)
+    }
+    
+    func deleteRows(at indexPaths: [IndexPath]) {
+        tableView.deleteRows(at: indexPaths, with: .fade)
     }
     
     func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {

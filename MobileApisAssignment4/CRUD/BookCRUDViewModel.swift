@@ -230,7 +230,7 @@ extension BookCRUDViewModel: BookFieldCellViewModelListener {
 private extension BookCRUDViewModel.Field {
     
     var validationMessage: String {
-        return "\(placeholder) \(Constants.bookFieldValidationErrorSubtext)"
+        return "\(placeholder) \(Constants.fieldErrorMessageSubtext)"
     }
     
 }

@@ -17,6 +17,7 @@ protocol BooksViewModelPresenter: AnyObject {
     func reloadSections(_ sections: IndexSet)
     func insertRows(at indexPaths: [IndexPath])
     func reloadRows(at indexPaths: [IndexPath])
+    func deleteRows(at indexPaths: [IndexPath])
     func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition)
     func push(_ viewController: UIViewController)
     func present(_ viewController: UIViewController)
@@ -34,6 +35,7 @@ protocol BooksViewModelable {
     func addButtonTapped()
     func getCellViewModel(at indexPath: IndexPath) -> BookCellViewModelable?
     func didSelectBook(at indexPath: IndexPath)
+    func trailingSwipedBook(at indexPath: IndexPath) -> UISwipeActionsConfiguration
 }
 
 final class BooksViewModel: BooksViewModelable,
@@ -114,6 +116,15 @@ extension BooksViewModel {
         showBookCRUDScreen(with: book.id)
     }
     
+    func trailingSwipedBook(at indexPath: IndexPath) -> UISwipeActionsConfiguration {
+        let action = UIContextualAction(style: .destructive, title: nil) { [weak self] (_, _, _) in
+            guard let book = self?.books[safe: indexPath.row] else { return }
+            self?.showDeleteAlert(for: book)
+        }
+        action.image = UIImage(systemName: "trash.fill")
+        return UISwipeActionsConfiguration(actions: [action])
+    }
+    
 }
 
 // MARK: - Private Helpers
@@ -129,6 +140,22 @@ private extension BooksViewModel {
                     guard let books = try? JSONDecoder().decode([Book].self, from: data) else { return }
                     self?.books = books
                     self?.presenter?.reloadSections(IndexSet(integer: 0))
+                case let .failure(error):
+                    self?.showToast(with: error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func deleteBook(_ book: Book) {
+        DataHandler.shared.deleteBook(with: book.id, authToken: authToken) { result in
+            DispatchQueue.main.async { [weak self] in
+                switch result {
+                case .success:
+                    guard let index = self?.books.firstIndex(where: { $0.id == book.id }) else { return }
+                    self?.books.remove(at: index)
+                    let indexPath = IndexPath(row: index, section: 0)
+                    self?.presenter?.deleteRows(at: [indexPath])
                 case let .failure(error):
                     self?.showToast(with: error.localizedDescription)
                 }
@@ -152,6 +179,27 @@ private extension BooksViewModel {
         DispatchQueue.main.async { [weak self] in
             self?.presenter?.scroll(to: indexPath, at: position)
         }
+    }
+    
+    func showDeleteAlert(for book: Book) {
+        let alertController = UIAlertController(
+            title: "\(Constants.delete) \"\(book.name)\"?",
+            message: Constants.deleteAlertMessage,
+            preferredStyle: .alert
+        )
+        let cancelAction = UIAlertAction(
+            title: Constants.alertCancelTitle,
+            style: .default
+        )
+        let deleteAction = UIAlertAction(
+            title: Constants.delete,
+            style: .destructive
+        ) { [weak self] _ in
+            self?.deleteBook(book)
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(deleteAction)
+        presenter?.present(alertController)
     }
     
 }

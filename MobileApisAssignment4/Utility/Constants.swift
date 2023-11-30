@@ -47,6 +47,8 @@ struct Constants {
     static let badRating: Double = 1
     static let inputCreationDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
     static let outputCreationDateFormat = "dd MMMM, yyyy"
+    static let delete = "Delete"
+    static let deleteAlertMessage = "This action will delete this book permanently."
     static let logoutAlertMessage = "You will have to sign in again once you log out."
     static let logoutAlertTitle = "Logout?"
     static let logoutAlertLogoutTitle = "Logout"
@@ -58,7 +60,6 @@ struct Constants {
     static let ratingFieldPlaceholder = "Rating (out of 5)"
     static let authorFieldPlaceholder = "Author"
     static let genreFieldPlaceholder = "Genre"
-    static let bookFieldValidationErrorSubtext = "is required"
     static let ratingOutOfBounds = "Rating must fall between 0 and 5"
     static let bookExists = "A matching book already exists"
 

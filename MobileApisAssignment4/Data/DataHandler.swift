@@ -53,6 +53,11 @@ extension DataHandler {
         initiateRequest(type: .put, with: targetApi, completion: completion)
     }
     
+    func deleteBook(with bookId: String, authToken: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        let targetApi = ApiConstructor.delete(id: bookId, authToken: authToken)
+        initiateRequest(type: .delete, with: targetApi, completion: completion)
+    }
+    
 }
 
 // MARK: - Private Helpers
@@ -69,7 +74,8 @@ private extension DataHandler {
         case let .books(token),
             let .book(_, token),
             let .create(_, token),
-            let .update(_, token):
+            let .update(_, token),
+            let .delete(_, token):
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let params = targetApi.bodyParams,
