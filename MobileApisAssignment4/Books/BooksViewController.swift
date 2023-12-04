@@ -10,23 +10,33 @@ import UIKit
 final class BooksViewController: UIViewController,
                                  ViewLoadable {
     
+    // MARK: - Constants
+    
     static let name = Constants.storyboardName
     static let identifier = Constants.booksViewController
+    
+    // MARK: - Outlets
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var spinnerView: UIActivityIndicatorView!
     
+    // MARK: - Properties
+    
     var viewModel: BooksViewModelable?
-
+    
+    // MARK: - View Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
     }
-
+    
 }
 
 // MARK: - Private Helpers
 private extension BooksViewController {
+    
+    // MARK: - Setup
     
     func setup() {
         navigationItem.title = viewModel?.title
@@ -35,6 +45,8 @@ private extension BooksViewController {
         BookTableViewCell.register(for: tableView)
         viewModel?.screenDidLoad()
     }
+    
+    // MARK: - Navigation Bar Buttons
     
     func addLogoutButton() {
         let logoutButton = UIBarButtonItem(
@@ -55,6 +67,8 @@ private extension BooksViewController {
         )
         navigationItem.rightBarButtonItem = addButton
     }
+    
+    // MARK: - Button Actions
     
     @objc
     func logoutButtonTapped() {
@@ -101,6 +115,8 @@ extension BooksViewController: UITableViewDataSource {
 // MARK: - BooksViewModelPresenter Methods
 extension BooksViewController: BooksViewModelPresenter {
     
+    // MARK: - Loading and Presentation
+    
     func startLoading() {
         spinnerView.isHidden = false
         spinnerView.startAnimating()
@@ -110,6 +126,8 @@ extension BooksViewController: BooksViewModelPresenter {
         spinnerView.stopAnimating()
         spinnerView.isHidden = true
     }
+    
+    // MARK: - Table View Updates
     
     func reloadSections(_ indexSet: IndexSet) {
         tableView.reloadSections(indexSet, with: .fade)
@@ -127,9 +145,13 @@ extension BooksViewController: BooksViewModelPresenter {
         tableView.deleteRows(at: indexPaths, with: .fade)
     }
     
+    // MARK: - Table View Scrolling
+    
     func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {
         tableView.scrollToRow(at: indexPath, at: position, animated: true)
     }
+    
+    // MARK: - Navigation
     
     func push(_ viewController: UIViewController) {
         navigationController?.pushViewController(viewController, animated: true)

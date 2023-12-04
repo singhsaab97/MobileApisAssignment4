@@ -7,11 +7,13 @@
 
 import Foundation
 
+// Protocol for communication from BookCRUDViewModel to the associated listener
 protocol BookCRUDViewModelListener: AnyObject {
     func add(book: Book)
     func update(book: Book)
 }
 
+// Protocol for presenting actions and managing UI in BookCRUDViewModel
 protocol BookCRUDViewModelPresenter: AnyObject {
     func startLoading()
     func stopLoading()
@@ -24,6 +26,7 @@ protocol BookCRUDViewModelPresenter: AnyObject {
     func pop()
 }
 
+// Protocol defining the interface for BookCRUDViewModel
 protocol BookCRUDViewModelable {
     var numberOfFields: Int { get }
     var presenter: BookCRUDViewModelPresenter? { get set }
@@ -34,9 +37,10 @@ protocol BookCRUDViewModelable {
     func keyboardWillHide()
 }
 
-final class BookCRUDViewModel: BookCRUDViewModelable,
-                               Toastable {
+// Implementation of BookCRUDViewModel
+final class BookCRUDViewModel: BookCRUDViewModelable, Toastable {
     
+    // Enum defining different fields in the book details
     enum Field: CaseIterable {
         case name
         case rating
@@ -54,6 +58,7 @@ final class BookCRUDViewModel: BookCRUDViewModelable,
     
     weak var presenter: BookCRUDViewModelPresenter?
     
+    // Initialization with necessary parameters
     init(bookId: String?, authToken: String, listener: BookCRUDViewModelListener?) {
         self.bookId = bookId
         self.authToken = authToken
@@ -68,14 +73,17 @@ final class BookCRUDViewModel: BookCRUDViewModelable,
 // MARK: - Exposed Helpers
 extension BookCRUDViewModel {
     
+    // Number of fields in the book details
     var numberOfFields: Int {
         return fields.count
     }
     
+    // Load screen and fetch book details if bookId is provided
     func screenDidLoad() {
         fetchBook()
     }
     
+    // Handle "Done" button tap
     func doneButtonTapped() {
         guard doesPassValidation else { return }
         guard editableBook.isEqual(to: book) else {
@@ -85,6 +93,7 @@ extension BookCRUDViewModel {
         showToast(with: Constants.bookExists)
     }
     
+    // Get view model for a specific field at an index path
     func getCellViewModel(at indexPath: IndexPath) -> BookFieldCellViewModel? {
         guard let field = fields[safe: indexPath.row] else { return nil }
         let detail: String
@@ -101,19 +110,22 @@ extension BookCRUDViewModel {
         return BookFieldCellViewModel(field: field, detail: detail, listener: self)
     }
     
+    // Handle keyboard show event
     func keyboardWillShow(with frame: CGRect) {
         presenter?.showKeyboard(with: frame.height, duration: Constants.animationDuration)
     }
     
+    // Handle keyboard hide event
     func keyboardWillHide() {
         presenter?.hideKeyboard(with: Constants.animationDuration)
     }
     
 }
 
-// MARK: - Private Helpera
+// MARK: - Private Helpers
 private extension BookCRUDViewModel {
     
+    // Validation check for all fields
     var doesPassValidation: Bool {
         for field in fields {
             switch field {
@@ -146,6 +158,7 @@ private extension BookCRUDViewModel {
         return true
     }
     
+    // Fetch book details from the server
     func fetchBook() {
         guard let bookId = bookId else {
             presenter?.setNavigationTitle(Constants.addBook)
@@ -169,6 +182,7 @@ private extension BookCRUDViewModel {
         }
     }
     
+    // Add a new book to the server
     func addBook() {
         presenter?.startLoadingDoneButton()
         DataHandler.shared.addBook(editableBook, authToken: authToken) { result in
@@ -188,6 +202,7 @@ private extension BookCRUDViewModel {
         }
     }
     
+    // Update an existing book on the server
     func updateBook() {
         presenter?.startLoadingDoneButton()
         DataHandler.shared.updateBook(editableBook, authToken: authToken) { result in
@@ -210,6 +225,7 @@ private extension BookCRUDViewModel {
 // MARK: - BookFieldCellViewModelListener Methods
 extension BookCRUDViewModel: BookFieldCellViewModelListener {
     
+    // Update the field value in the editable book
     func fieldUpdated(_ field: Field, with text: String?) {
         guard let text = text else { return }
         switch field {
@@ -229,6 +245,7 @@ extension BookCRUDViewModel: BookFieldCellViewModelListener {
 // MARK: - BookCRUDViewModel.Field Helpers
 private extension BookCRUDViewModel.Field {
     
+    // Validation error message for each field
     var validationMessage: String {
         return "\(placeholder) \(Constants.fieldErrorMessageSubtext)"
     }

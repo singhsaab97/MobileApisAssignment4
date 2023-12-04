@@ -7,10 +7,12 @@
 
 import UIKit
 
+// Protocol for notifying when the user logs out
 protocol BooksViewModelListener: AnyObject {
     func userLoggingOut()
 }
 
+// Protocol for presenting updates in the UI
 protocol BooksViewModelPresenter: AnyObject {
     func startLoading()
     func stopLoading()
@@ -24,6 +26,7 @@ protocol BooksViewModelPresenter: AnyObject {
     func dismiss()
 }
 
+// Protocol defining the requirements for the BooksViewModel
 protocol BooksViewModelable {
     var title: String { get }
     var logoutButtonImage: UIImage? { get }
@@ -38,10 +41,9 @@ protocol BooksViewModelable {
     func trailingSwipedBook(at indexPath: IndexPath) -> UISwipeActionsConfiguration
 }
 
-final class BooksViewModel: BooksViewModelable,
-                            Toastable {
+// Concrete implementation of the BooksViewModel
+final class BooksViewModel: BooksViewModelable, Toastable {
     
-
     private let authToken: String
     private var books: [Book]
     
@@ -49,17 +51,14 @@ final class BooksViewModel: BooksViewModelable,
     
     weak var presenter: BooksViewModelPresenter?
     
+    // Initialization
     init(authToken: String, listener: BooksViewModelListener?) {
         self.authToken = authToken
         self.books = []
         self.listener = listener
     }
     
-}
-
-// MARK: - Exposed Helpers
-extension BooksViewModel {
-    
+    // Computed properties and methods exposed to the view controller
     var title: String {
         return Constants.books
     }
@@ -76,11 +75,14 @@ extension BooksViewModel {
         return books.count
     }
     
+    // Load books when the screen loads
     func screenDidLoad() {
         fetchBooks()
     }
     
+    // Handle logout button tap
     func logoutButtonTapped() {
+        // Display alert to confirm logout
         let alertController = UIAlertController(
             title: Constants.logoutAlertTitle,
             message: Constants.logoutAlertMessage,
@@ -102,20 +104,24 @@ extension BooksViewModel {
         presenter?.present(alertController)
     }
     
+    // Handle add button tap
     func addButtonTapped() {
         showBookCRUDScreen()
     }
     
+    // Get the view model for a cell at a specific index path
     func getCellViewModel(at indexPath: IndexPath) -> BookCellViewModelable? {
         guard let book = books[safe: indexPath.row] else { return nil }
         return BookCellViewModel(book: book)
     }
     
+    // Handle book selection
     func didSelectBook(at indexPath: IndexPath) {
         guard let book = books[safe: indexPath.row] else { return }
         showBookCRUDScreen(with: book.id)
     }
     
+    // Provide swipe actions for a book cell
     func trailingSwipedBook(at indexPath: IndexPath) -> UISwipeActionsConfiguration {
         let action = UIContextualAction(style: .destructive, title: nil) { [weak self] (_, _, _) in
             guard let book = self?.books[safe: indexPath.row] else { return }
@@ -124,12 +130,12 @@ extension BooksViewModel {
         action.image = UIImage(systemName: "trash.fill")
         return UISwipeActionsConfiguration(actions: [action])
     }
-    
 }
 
-// MARK: - Private Helpers
+// Extension for private helper methods
 private extension BooksViewModel {
     
+    // Fetch books from the server
     func fetchBooks() {
         presenter?.startLoading()
         DataHandler.shared.fetchBooks(with: authToken) { result in
@@ -147,6 +153,7 @@ private extension BooksViewModel {
         }
     }
     
+    // Delete a book from the server
     func deleteBook(_ book: Book) {
         DataHandler.shared.deleteBook(with: book.id, authToken: authToken) { result in
             DispatchQueue.main.async { [weak self] in
@@ -163,6 +170,7 @@ private extension BooksViewModel {
         }
     }
     
+    // Show the Book CRUD screen
     func showBookCRUDScreen(with bookId: String? = nil) {
         let viewModel = BookCRUDViewModel(
             bookId: bookId,
@@ -175,12 +183,12 @@ private extension BooksViewModel {
         presenter?.push(viewController)
     }
     
+    // Scroll to a specific indexPath in the table view
     func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {
-        DispatchQueue.main.async { [weak self] in
-            self?.presenter?.scroll(to: indexPath, at: position)
-        }
+        tableView.scrollToRow(at: indexPath, at: position, animated: true)
     }
     
+    // Show delete confirmation alert
     func showDeleteAlert(for book: Book) {
         let alertController = UIAlertController(
             title: "\(Constants.delete) \"\(book.name)\"?",
@@ -201,31 +209,31 @@ private extension BooksViewModel {
         alertController.addAction(deleteAction)
         presenter?.present(alertController)
     }
-    
 }
 
-// MARK: - BookCRUDViewModelListener Methods
+// Extension for handling updates from the BookCRUDViewModel
 extension BooksViewModel: BookCRUDViewModelListener {
     
+    // Handle addition of a new book
     func add(book: Book) {
         DispatchQueue.main.asyncAfter(deadline: .now() + Constants.delayDuration) { [weak self] in
             guard let self = self else { return }
-            books.append(book)
-            let indexPath = IndexPath(row: books.count - 1, section: 0)
-            presenter?.insertRows(at: [indexPath])
-            scroll(to: indexPath, at: .bottom)
+            self.books.append(book)
+            let indexPath = IndexPath(row: self.books.count - 1, section: 0)
+            self.presenter?.insertRows(at: [indexPath])
+            self.scroll(to: indexPath, at: .bottom)
         }
     }
     
+    // Handle updating an existing book
     func update(book: Book) {
         DispatchQueue.main.asyncAfter(deadline: .now() + Constants.delayDuration) { [weak self] in
             guard let self = self,
-                  let index = books.firstIndex(where: { $0.id == book.id }) else { return }
-            books[index] = book
+                  let index = self.books.firstIndex(where: { $0.id == book.id }) else { return }
+            self.books[index] = book
             let indexPath = IndexPath(row: index, section: 0)
-            presenter?.reloadRows(at: [indexPath])
-            scroll(to: indexPath, at: .middle)
+            self.presenter?.reloadRows(at: [indexPath])
+            self.scroll(to: indexPath, at: .middle)
         }
     }
-    
 }

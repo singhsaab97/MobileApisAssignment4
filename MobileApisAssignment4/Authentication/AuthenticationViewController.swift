@@ -7,12 +7,15 @@
 
 import UIKit
 
+// AuthenticationViewController is responsible for displaying and handling user authentication-related UI.
 final class AuthenticationViewController: UIViewController,
                                           ViewLoadable {
     
+    // Constants for the storyboard and view controller identifier.
     static let name = Constants.storyboardName
     static let identifier = Constants.authenticationViewController
     
+    // Outlets for UI elements in the authentication view.
     @IBOutlet private weak var headingStackView: UIStackView!
     @IBOutlet private weak var titleLabel: UILabel!
     @IBOutlet private weak var subtitleLabel: UILabel!
@@ -27,8 +30,10 @@ final class AuthenticationViewController: UIViewController,
     @IBOutlet private weak var messageButton: UIButton!
     @IBOutlet private weak var messageStackViewBottomConstraint: NSLayoutConstraint!
     
+    // ViewModel responsible for handling the business logic.
     var viewModel: AuthenticationViewModelable?
-
+    
+    // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
@@ -44,6 +49,7 @@ final class AuthenticationViewController: UIViewController,
 // MARK: - Private Helpers
 private extension AuthenticationViewController {
     
+    // Sets up the initial UI and invokes ViewModel methods.
     func setup() {
         navigationController?.setNavigationBarHidden(true, animated: false)
         setupTitleLabel()
@@ -57,18 +63,23 @@ private extension AuthenticationViewController {
         viewModel?.screenDidLoad()
     }
     
+    // Sets up the title label with text from ViewModel.
     func setupTitleLabel() {
         titleLabel.text = viewModel?.flow.titleLabelText
     }
-
+    
+    // Sets up the subtitle label with text from ViewModel.
     func setupSubtitleLabel() {
         subtitleLabel.text = viewModel?.flow.subtitleLabelText
     }
-
+    
+    // Sets up detail text fields based on the ViewModel flow.
     func setupDetailTextFields() {
         viewModel?.flow.fields.forEach { field in
+            // Configures text field properties based on ViewModel data.
             let textField = getTextField(for: field)
             textField.tag = field.rawValue
+            // Configures placeholder attributes.
             textField.attributedPlaceholder = NSAttributedString(
                 string: field.placeholder,
                 attributes: [
@@ -79,68 +90,38 @@ private extension AuthenticationViewController {
             textField.layer.cornerRadius = 12
             textField.keyboardType = field.keyboardType
             textField.isSecureTextEntry = field.isPasswordProtected
-            // Horizontal views
-            let textFieldViewWidth: CGFloat = 15
-            let fieldViewFrame = CGRect(
-                x: 0,
-                y: 0,
-                width: textFieldViewWidth,
-                height: textField.bounds.height
-            )
-            let leftView = UIView(frame: fieldViewFrame)
-            textField.leftView = leftView
-            textField.leftViewMode = .always
-            let rightView = UIView(frame: fieldViewFrame)
-            textField.rightView = rightView
-            textField.rightViewMode = .always
-            if field.isPasswordProtected {
-                // Add eye button
-                let eyeButtonImageSize = CGSize(width: 27, height: 18.667)
-                rightView.frame.size = CGSize(
-                    width: 2 * fieldViewFrame.width + eyeButtonImageSize.width,
-                    height: fieldViewFrame.height
-                )
-                let eyeButton = UIButton(type: .system)
-                eyeButton.tag = field.rawValue
-                eyeButton.tintColor = UIColor.tertiaryLabel
-                let eyeButtonFrame = CGRect(
-                    x: rightView.frame.midX - eyeButtonImageSize.width / 2,
-                    y: rightView.frame.midY - eyeButtonImageSize.height / 2,
-                    width: eyeButtonImageSize.width,
-                    height: eyeButtonImageSize.height
-                )
-                eyeButton.frame = eyeButtonFrame
-                eyeButton.addTarget(
-                    self,
-                    action: #selector(eyeButtonTapped(_:)),
-                    for: .touchUpInside
-                )
-                rightView.addSubview(eyeButton)
-            }
+            // Configures left and right views for secure text entry fields.
+            configureSecureTextFieldViews(field, textField)
         }
+        // Hides specified fields based on ViewModel data.
         viewModel?.flow.hiddenFields.forEach { field in
             let textField = getTextField(for: field)
             textField.isHidden = true
         }
     }
-
+    
+    // Sets up the primary button with text from ViewModel.
     func setupPrimaryButton() {
         primaryButton.setTitle(viewModel?.flow.primaryButtonTitle, for: .normal)
         primaryButton.layer.cornerRadius = 12
     }
     
+    // Sets up the spinner view for loading state.
     func setupSpinnerView() {
         spinnerView.isHidden = true
     }
-
+    
+    // Sets up the message label with text from ViewModel.
     func setupMessageLabel() {
         messageLabel.text = viewModel?.flow.messageLabelText
     }
-
+    
+    // Sets up the message button with text from ViewModel.
     func setupMessageButton() {
         messageButton.setTitle(viewModel?.flow.messageButtonTitle, for: .normal)
     }
     
+    // Adds keyboard observers to manage UI adjustments during keyboard events.
     func addKeyboardObservers() {
         NotificationCenter.default.addObserver(
             forName: UIResponder.keyboardWillShowNotification,
@@ -157,8 +138,8 @@ private extension AuthenticationViewController {
             self?.keyboardWillHide()
         }
     }
-
-    /// Returns a text field for the specified `field` type
+    
+    // Returns a text field for the specified `field` type
     func getTextField(for field: AuthenticationViewModel.Field) -> UITextField {
         switch field {
         case .firstName:
@@ -174,24 +155,29 @@ private extension AuthenticationViewController {
         }
     }
     
+    // Handles keyboard show event and notifies the ViewModel.
     func keyboardWillShow(_ notification: Notification) {
         guard let frame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
         viewModel?.keyboardWillShow(with: frame)
     }
     
+    // Handles keyboard hide event and notifies the ViewModel.
     func keyboardWillHide() {
         viewModel?.keyboardWillHide()
     }
-
+    
+    // Handles eye button tap event for secure text entry fields.
     @objc
     func eyeButtonTapped(_ sender: UIButton) {
         viewModel?.eyeButtonTapped(with: sender.tag)
     }
     
+    // Handles primary button tap event and notifies the ViewModel.
     @IBAction func primaryButtonTapped() {
         viewModel?.primaryButtonTapped()
     }
     
+    // Handles message button tap event and notifies the ViewModel.
     @IBAction func messageButtonTapped() {
         viewModel?.messageButtonTapped()
     }
@@ -201,6 +187,7 @@ private extension AuthenticationViewController {
 // MARK: - AuthenticationPresenter Methods
 extension AuthenticationViewController: AuthenticationPresenter {
     
+    // Properties to get user input from text fields.
     var userFirstName: String? {
         return firstNameTextField.text
     }
@@ -216,15 +203,17 @@ extension AuthenticationViewController: AuthenticationPresenter {
     var userPassword: String? {
         return passwordTextField.text
     }
-
+    
     var userConfirmedPassword: String? {
         return confirmPasswordTextField.text
     }
     
+    // Returns the count of view controllers in the navigation stack.
     var viewControllersCount: Int {
         return navigationController?.viewControllers.count ?? 0
     }
     
+    // Methods to handle loading state and UI updates.
     func startLoading() {
         primaryButton.setTitle(nil, for: .normal)
         spinnerView.isHidden = false
@@ -236,7 +225,8 @@ extension AuthenticationViewController: AuthenticationPresenter {
         spinnerView.isHidden = true
         primaryButton.setTitle(viewModel?.flow.primaryButtonTitle, for: .normal)
     }
-
+    
+    // Methods to update UI elements based on ViewModel data.
     func updateHeadingStackView(isHidden: Bool) {
         headingStackView.isHidden = isHidden
     }
@@ -256,12 +246,12 @@ extension AuthenticationViewController: AuthenticationPresenter {
             self?.view?.layoutIfNeeded()
         }
     }
-
+    
     func updatePasswordField(_ field: AuthenticationViewModel.Field, isTextHidden: Bool) {
         let textField = getTextField(for: field)
         textField.isSecureTextEntry = isTextHidden
     }
-
+    
     func updateEyeButtonImage(for field: AuthenticationViewModel.Field, with image: UIImage?) {
         let textField = getTextField(for: field)
         guard let button = textField.rightView?.subviews
@@ -280,15 +270,16 @@ extension AuthenticationViewController: AuthenticationPresenter {
         let textField = getTextField(for: field)
         textField.becomeFirstResponder()
     }
-
+    
+    // Navigation methods to handle view controller transitions.
     func push(_ viewController: UIViewController) {
         navigationController?.pushViewController(viewController, animated: true)
     }
-
+    
     func pop() {
         navigationController?.popViewController(animated: true)
     }
-
+    
     func present(_ viewController: UIViewController) {
         navigationController?.present(viewController, animated: true)
     }
@@ -297,7 +288,8 @@ extension AuthenticationViewController: AuthenticationPresenter {
 
 // MARK: - AuthenticationViewModel.Field Helpers
 private extension AuthenticationViewModel.Field {
-
+    
+    // Returns the keyboard type based on the field type.
     var keyboardType: UIKeyboardType {
         switch self {
         case .firstName, .lastName:
@@ -308,5 +300,5 @@ private extension AuthenticationViewModel.Field {
             return .default
         }
     }
-
+    
 }

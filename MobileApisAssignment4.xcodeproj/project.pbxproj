@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C9AF6D02B1E1B4F00D0B3FF /* LocalStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9AF6CF2B1E1B4F00D0B3FF /* LocalStorage.swift */; };
 		7CB08EC52B1782F8000A45E5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB08EC42B1782F8000A45E5 /* AppDelegate.swift */; };
 		7CB08EC72B1782F8000A45E5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB08EC62B1782F8000A45E5 /* SceneDelegate.swift */; };
 		7CB08ECE2B1782F9000A45E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB08ECD2B1782F9000A45E5 /* Assets.xcassets */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7C9AF6CF2B1E1B4F00D0B3FF /* LocalStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStorage.swift; sourceTree = "<group>"; };
 		7CB08EC12B1782F8000A45E5 /* MobileApisAssignment4.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileApisAssignment4.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CB08EC42B1782F8000A45E5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7CB08EC62B1782F8000A45E5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				7CB08ECD2B1782F9000A45E5 /* Assets.xcassets */,
 				7CB08EFF2B1783D4000A45E5 /* Protocols.swift */,
 				7CB08F012B1783D8000A45E5 /* Constants.swift */,
+				7C9AF6CF2B1E1B4F00D0B3FF /* LocalStorage.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -305,6 +308,7 @@
 				7CB08EF62B1783B7000A45E5 /* ToastView.swift in Sources */,
 				7CDD39BB2B17B26200F2C365 /* BookFieldCellViewModel.swift in Sources */,
 				7CB08F092B1783FE000A45E5 /* AuthenticationViewModel.swift in Sources */,
+				7C9AF6D02B1E1B4F00D0B3FF /* LocalStorage.swift in Sources */,
 				7CB08EE82B17838C000A45E5 /* BookCellViewModel.swift in Sources */,
 				7CB08EFC2B1783C3000A45E5 /* Data+Extensions.swift in Sources */,
 				7CB08EE42B178378000A45E5 /* BooksViewModel.swift in Sources */,

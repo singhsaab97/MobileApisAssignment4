@@ -2,11 +2,12 @@
 //  ApiConstructor.swift
 //  MobileApisAssignment4
 //
-//  Created by Abhijit Singh on 15/11/23.
+//  Created by Ilham Sheikh on 15/11/23.
 //
 
 import Foundation
 
+// Enum defining different types of HTTP requests
 enum RequestType {
     case get
     case post
@@ -14,6 +15,7 @@ enum RequestType {
     case delete
 }
 
+// Enum defining various API requests with associated data
 enum ApiConstructor {
     case register(firstName: String, lastName: String, emailId: String, password: String)
     case login(emailId: String, password: String)
@@ -27,6 +29,7 @@ enum ApiConstructor {
 // MARK: - Exposed Helpers
 extension ApiConstructor {
     
+    // Computed property to get the endpoint URL for the API request
     var endpointUrl: URL! {
         let urlPath: String
         switch self {
@@ -45,9 +48,11 @@ extension ApiConstructor {
         case let .delete(id, _):
             urlPath = "book/del/\(id)"
         }
+        // Construct and return the full URL by combining the base URL and the endpoint path
         return URL(string: "\(Constants.baseUrlPath)\(urlPath)")
     }
     
+    // Computed property to get the body parameters for the API request
     var bodyParams: [String: Any]? {
         switch self {
         case let .register(firstName, lastName, emailId, password):
@@ -65,6 +70,7 @@ extension ApiConstructor {
         case let .create(book, _),
             let .update(book, _):
             return [
+                // Map the Book properties to the corresponding API parameters
                 Book.CodingKeys.name.rawValue: book.name,
                 Book.CodingKeys.rating.rawValue: book.rating,
                 Book.CodingKeys.author.rawValue: book.author,
@@ -80,6 +86,7 @@ extension ApiConstructor {
 // MARK: - Request Helpers
 extension RequestType {
     
+    // Computed property to get the HTTP method string for the request
     var method: String {
         switch self {
         case .get:
