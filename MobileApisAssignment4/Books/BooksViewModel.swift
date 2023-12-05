@@ -185,7 +185,7 @@ private extension BooksViewModel {
     
     // Scroll to a specific indexPath in the table view
     func scroll(to indexPath: IndexPath, at position: UITableView.ScrollPosition) {
-        tableView.scrollToRow(at: indexPath, at: position, animated: true)
+        presenter?.scroll(to: indexPath, at: position)
     }
     
     // Show delete confirmation alert

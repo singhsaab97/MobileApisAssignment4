@@ -76,10 +76,8 @@ private extension AuthenticationViewController {
     // Sets up detail text fields based on the ViewModel flow.
     func setupDetailTextFields() {
         viewModel?.flow.fields.forEach { field in
-            // Configures text field properties based on ViewModel data.
             let textField = getTextField(for: field)
             textField.tag = field.rawValue
-            // Configures placeholder attributes.
             textField.attributedPlaceholder = NSAttributedString(
                 string: field.placeholder,
                 attributes: [
@@ -90,10 +88,45 @@ private extension AuthenticationViewController {
             textField.layer.cornerRadius = 12
             textField.keyboardType = field.keyboardType
             textField.isSecureTextEntry = field.isPasswordProtected
-            // Configures left and right views for secure text entry fields.
-            configureSecureTextFieldViews(field, textField)
+            // Horizontal views
+            let textFieldViewWidth: CGFloat = 15
+            let fieldViewFrame = CGRect(
+                x: 0,
+                y: 0,
+                width: textFieldViewWidth,
+                height: textField.bounds.height
+            )
+            let leftView = UIView(frame: fieldViewFrame)
+            textField.leftView = leftView
+            textField.leftViewMode = .always
+            let rightView = UIView(frame: fieldViewFrame)
+            textField.rightView = rightView
+            textField.rightViewMode = .always
+            if field.isPasswordProtected {
+                // Add eye button
+                let eyeButtonImageSize = CGSize(width: 27, height: 18.667)
+                rightView.frame.size = CGSize(
+                    width: 2 * fieldViewFrame.width + eyeButtonImageSize.width,
+                    height: fieldViewFrame.height
+                )
+                let eyeButton = UIButton(type: .system)
+                eyeButton.tag = field.rawValue
+                eyeButton.tintColor = UIColor.tertiaryLabel
+                let eyeButtonFrame = CGRect(
+                    x: rightView.frame.midX - eyeButtonImageSize.width / 2,
+                    y: rightView.frame.midY - eyeButtonImageSize.height / 2,
+                    width: eyeButtonImageSize.width,
+                    height: eyeButtonImageSize.height
+                )
+                eyeButton.frame = eyeButtonFrame
+                eyeButton.addTarget(
+                    self,
+                    action: #selector(eyeButtonTapped(_:)),
+                    for: .touchUpInside
+                )
+                rightView.addSubview(eyeButton)
+            }
         }
-        // Hides specified fields based on ViewModel data.
         viewModel?.flow.hiddenFields.forEach { field in
             let textField = getTextField(for: field)
             textField.isHidden = true
